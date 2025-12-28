@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weixi.blog.mapper.UserMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="UserMap" type="com.weixi.blog.entity.User">
+        <id column="id" property="id"/>
+        <result column="openid" property="openid"/>
+        <result column="nickname" property="nickname"/>
+        <result column="avatar" property="avatar"/>
+        <result column="gender" property="gender"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 插入用户 -->
+    <insert id="insert" parameterType="com.weixi.blog.entity.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_user (openid, nickname, avatar, gender, create_time, update_time)
+        VALUES (#{openid}, #{nickname}, #{avatar}, #{gender}, NOW(), NOW())
+    </insert>
+
+    <!-- 更新用户 -->
+    <update id="updateById" parameterType="com.weixi.blog.entity.User">
+        UPDATE t_user
+        SET nickname = #{nickname},
+            avatar = #{avatar},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据ID查询用户 -->
+    <select id="selectById" resultMap="UserMap">
+        SELECT 
+            id,
+            openid,
+            nickname,
+            avatar,
+            gender,
+            create_time,
+            update_time
+        FROM t_user
+        WHERE id = #{id}
+    </select>
+
+    <!-- 根据openid查询用户 -->
+    <select id="selectByOpenid" resultMap="UserMap">
+        SELECT 
+            id,
+            openid,
+            nickname,
+            avatar,
+            gender,
+            create_time,
+            update_time
+        FROM t_user
+        WHERE openid = #{openid}
+    </select>
+
+</mapper>
+
