@@ -1,5 +1,6 @@
 package com.weixi.blog.service.impl;
 
+import com.weixi.blog.dto.UserUpdateDTO;
 import com.weixi.blog.entity.User;
 import com.weixi.blog.mapper.UserMapper;
 import com.weixi.blog.service.UserService;
@@ -22,50 +23,26 @@ public class UserServiceImpl implements UserService {
     
     @Override
     @Transactional
-    public UserVO login(String code, String nickname, String avatar) {
-        String openid = null;
-        
-        // 测试环境：使用临时openid（如果不需要真实微信登录）
-        // 如果需要真实微信登录，请取消注释微信SDK相关代码
-        if (code != null && !code.isEmpty() && !code.startsWith("test_")) {
-            // 如果有真实微信code，可以在这里调用微信API
-            // 当前使用测试模式，生成临时openid
-            openid = "test_openid_" + System.currentTimeMillis();
-        } else {
-            // 测试环境：如果没有配置微信信息，使用临时openid
-            openid = "test_openid_" + System.currentTimeMillis();
-        }
-        
-        // 查询用户是否存在
-        User user = findByOpenid(openid);
-        
+    public UserVO login(String username, String password) {
+        User user = findByUsername(username);
         if (user == null) {
-            // 新用户，自动注册
-            user = new User();
-            user.setOpenid(openid);
-            user.setNickname(nickname != null ? nickname : "微信用户");
-            user.setAvatar(avatar);
-            userMapper.insert(user);
-        } else {
-            // 老用户，更新昵称和头像（如果提供了）
-            if (nickname != null && !nickname.isEmpty()) {
-                user.setNickname(nickname);
-            }
-            if (avatar != null && !avatar.isEmpty()) {
-                user.setAvatar(avatar);
-            }
-            userMapper.updateById(user);
+            throw new RuntimeException("用户名或密码错误");
         }
         
-        // 转换为VO返回
+        // 验证密码（直接字符串比较，不使用哈希）
+        if (!password.equals(user.getPassword())) {
+            throw new RuntimeException("用户名或密码错误");
+        }
+        
+        // 转换为VO返回（不包含密码）
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
         return userVO;
     }
     
     @Override
-    public User findByOpenid(String openid) {
-        return userMapper.selectByOpenid(openid);
+    public User findByUsername(String username) {
+        return userMapper.selectByUsername(username);
     }
     
     @Override
@@ -77,5 +54,44 @@ public class UserServiceImpl implements UserService {
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
         return userVO;
+    }
+    
+    @Override
+    @Transactional
+    public void updateUser(Long userId, UserUpdateDTO userUpdateDTO) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
+        }
+        
+        if (userUpdateDTO.getNickname() != null) {
+            user.setNickname(userUpdateDTO.getNickname());
+        }
+        if (userUpdateDTO.getAvatar() != null) {
+            user.setAvatar(userUpdateDTO.getAvatar());
+        }
+        if (userUpdateDTO.getEmail() != null) {
+            user.setEmail(userUpdateDTO.getEmail());
+        }
+        
+        userMapper.updateById(user);
+    }
+    
+    @Override
+    @Transactional
+    public void changePassword(Long userId, String oldPassword, String newPassword) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
+        }
+        
+        // 验证旧密码（直接字符串比较，不使用哈希）
+        if (!oldPassword.equals(user.getPassword())) {
+            throw new RuntimeException("原密码错误");
+        }
+        
+        // 直接存储新密码（不加密）
+        user.setPassword(newPassword);
+        userMapper.updateById(user);
     }
 }

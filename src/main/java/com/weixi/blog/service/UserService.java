@@ -1,5 +1,6 @@
 package com.weixi.blog.service;
 
+import com.weixi.blog.dto.UserUpdateDTO;
 import com.weixi.blog.entity.User;
 import com.weixi.blog.vo.UserVO;
 
@@ -9,18 +10,28 @@ import com.weixi.blog.vo.UserVO;
 public interface UserService {
     
     /**
-     * 微信登录/注册
+     * 用户登录
      */
-    UserVO login(String code, String nickname, String avatar);
+    UserVO login(String username, String password);
     
     /**
-     * 根据OpenID查询用户
+     * 根据用户名查询用户
      */
-    User findByOpenid(String openid);
+    User findByUsername(String username);
     
     /**
      * 根据ID查询用户
      */
     UserVO findById(Long id);
+    
+    /**
+     * 更新用户信息
+     */
+    void updateUser(Long userId, UserUpdateDTO userUpdateDTO);
+    
+    /**
+     * 修改密码
+     */
+    void changePassword(Long userId, String oldPassword, String newPassword);
 }
 

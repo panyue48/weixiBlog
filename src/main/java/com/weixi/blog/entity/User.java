@@ -11,13 +11,15 @@ import java.time.LocalDateTime;
 public class User {
     private Long id;
     
-    private String openid;
+    private String username;
+    
+    private String password;
     
     private String nickname;
     
     private String avatar;
     
-    private Integer gender; // 0-未知，1-男，2-女
+    private String email;
     
     private LocalDateTime createTime;
     

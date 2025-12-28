@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 public class Type {
     private Long id;
     
+    private Long userId; // 用户ID
+    
     private String name;
     
     private String description;

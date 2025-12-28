@@ -110,6 +110,80 @@
         </where>
     </select>
 
+    <!-- 根据用户ID分页查询博客列表 -->
+    <select id="selectBlogPageByUserId" resultMap="BlogVOMap">
+        SELECT 
+            b.id,
+            b.title,
+            b.content,
+            b.first_picture,
+            b.views,
+            b.type_id,
+            t.name AS type_name,
+            b.user_id,
+            u.nickname AS user_nickname,
+            u.avatar AS user_avatar,
+            b.published,
+            b.create_time,
+            b.update_time,
+            tag.id AS tag_id,
+            tag.name AS tag_name,
+            tag.color AS tag_color
+        FROM t_blog b
+        LEFT JOIN t_type t ON b.type_id = t.id
+        LEFT JOIN t_user u ON b.user_id = u.id
+        LEFT JOIN t_blog_tags bt ON b.id = bt.blog_id
+        LEFT JOIN t_tag tag ON bt.tag_id = tag.id
+        <where>
+            AND b.user_id = #{userId}
+            <if test="published != null">
+                AND b.published = #{published}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (b.title LIKE CONCAT('%', #{keyword}, '%') 
+                     OR b.content LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="typeId != null">
+                AND b.type_id = #{typeId}
+            </if>
+            <if test="tagId != null">
+                AND EXISTS (
+                    SELECT 1 FROM t_blog_tags bt2 
+                    WHERE bt2.blog_id = b.id AND bt2.tag_id = #{tagId}
+                )
+            </if>
+        </where>
+        ORDER BY b.create_time DESC
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+
+    <!-- 根据用户ID查询总数 -->
+    <select id="countBlogsByUserId" resultType="int">
+        SELECT COUNT(DISTINCT b.id)
+        FROM t_blog b
+        <where>
+            AND b.user_id = #{userId}
+            <if test="published != null">
+                AND b.published = #{published}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (b.title LIKE CONCAT('%', #{keyword}, '%') 
+                     OR b.content LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="typeId != null">
+                AND b.type_id = #{typeId}
+            </if>
+            <if test="tagId != null">
+                AND EXISTS (
+                    SELECT 1 FROM t_blog_tags bt2 
+                    WHERE bt2.blog_id = b.id AND bt2.tag_id = #{tagId}
+                )
+            </if>
+        </where>
+    </select>
+
     <!-- 根据ID查询博客详情 -->
     <select id="selectBlogDetailById" resultMap="BlogVOMap">
         SELECT 

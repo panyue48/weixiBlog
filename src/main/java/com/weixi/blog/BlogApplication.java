@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * 微信小程序博客系统启动类
+ * 个人博客系统启动类
  */
 @SpringBootApplication
 @MapperScan("com.weixi.blog.mapper")

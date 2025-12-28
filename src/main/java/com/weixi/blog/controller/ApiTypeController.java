@@ -3,11 +3,10 @@ package com.weixi.blog.controller;
 import com.weixi.blog.common.Result;
 import com.weixi.blog.entity.Type;
 import com.weixi.blog.service.TypeService;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class ApiTypeController {
     private TypeService typeService;
     
     /**
-     * 查询所有分类
+     * 前台：查询所有分类（已废弃，保留兼容性）
      */
     @GetMapping("/list")
     public Result<List<Type>> getAllTypes() {
@@ -42,5 +41,76 @@ public class ApiTypeController {
             return Result.error("查询失败: " + errorMsg);
         }
     }
+    
+    /**
+     * 后台：根据当前用户查询所有分类
+     */
+    @GetMapping("/admin/list")
+    public Result<List<Type>> getTypesByUserId(HttpSession session) {
+        try {
+            Long userId = (Long) session.getAttribute("userId");
+            if (userId == null) {
+                return Result.error("未登录");
+            }
+            List<Type> types = typeService.getTypesByUserId(userId);
+            return Result.success(types);
+        } catch (Exception e) {
+            log.error("查询分类列表失败", e);
+            return Result.error("查询失败: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 后台：创建分类
+     */
+    @PostMapping("/save")
+    public Result<Long> createType(@RequestBody Type type, HttpSession session) {
+        try {
+            Long userId = (Long) session.getAttribute("userId");
+            if (userId == null) {
+                return Result.error("未登录");
+            }
+            Long typeId = typeService.createType(userId, type);
+            return Result.success("创建成功", typeId);
+        } catch (Exception e) {
+            log.error("创建分类失败", e);
+            return Result.error("创建失败: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 后台：更新分类
+     */
+    @PutMapping("/{id}")
+    public Result<Void> updateType(@PathVariable Long id, @RequestBody Type type, HttpSession session) {
+        try {
+            Long userId = (Long) session.getAttribute("userId");
+            if (userId == null) {
+                return Result.error("未登录");
+            }
+            typeService.updateType(id, userId, type);
+            return Result.success("更新成功", null);
+        } catch (Exception e) {
+            log.error("更新分类失败", e);
+            return Result.error("更新失败: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 后台：删除分类
+     */
+    @DeleteMapping("/{id}")
+    public Result<Void> deleteType(@PathVariable Long id, HttpSession session) {
+        try {
+            Long userId = (Long) session.getAttribute("userId");
+            if (userId == null) {
+                return Result.error("未登录");
+            }
+            typeService.deleteType(id, userId);
+            return Result.success("删除成功", null);
+        } catch (Exception e) {
+            log.error("删除分类失败", e);
+            return Result.error("删除失败: " + e.getMessage());
+        }
+    }
 }
-

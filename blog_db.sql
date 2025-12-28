@@ -1,5 +1,5 @@
 -- ============================================
--- 微信小程序个人博客系统 - 数据库设计
+-- 个人博客系统 - 数据库设计
 -- Database: blog_db
 -- ============================================
 
@@ -17,60 +17,74 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `t_user`;
 CREATE TABLE `t_user` (
   `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-  `openid` VARCHAR(100) NOT NULL COMMENT '微信OpenID，唯一标识',
+  `username` VARCHAR(50) NOT NULL COMMENT '用户名，唯一标识',
+  `password` VARCHAR(255) NOT NULL COMMENT '密码（加密存储）',
   `nickname` VARCHAR(100) DEFAULT NULL COMMENT '用户昵称',
   `avatar` VARCHAR(500) DEFAULT NULL COMMENT '头像URL',
-  `gender` TINYINT(1) DEFAULT 0 COMMENT '性别：0-未知，1-男，2-女',
+  `email` VARCHAR(100) DEFAULT NULL COMMENT '邮箱',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_openid` (`openid`),
+  UNIQUE KEY `uk_username` (`username`),
   KEY `idx_create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
 
+-- 插入测试用户（密码：admin123，实际应该使用BCrypt加密）
+-- 默认密码为 admin123，实际使用时需要加密
+INSERT INTO `t_user` (`username`, `password`, `nickname`, `email`) VALUES
+('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iwK8pJ1a', '管理员', 'admin@example.com');
+
 -- ============================================
--- 2. 分类表 (t_type)
+-- 2. 分类表 (t_type) - 每个用户管理自己的分类
 -- ============================================
 DROP TABLE IF EXISTS `t_type`;
 CREATE TABLE `t_type` (
   `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '分类ID',
+  `user_id` BIGINT(20) NOT NULL COMMENT '用户ID',
   `name` VARCHAR(50) NOT NULL COMMENT '分类名称',
   `description` VARCHAR(200) DEFAULT NULL COMMENT '分类描述',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_name` (`name`)
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_name` (`name`),
+  UNIQUE KEY `uk_user_name` (`user_id`, `name`),
+  CONSTRAINT `fk_type_user` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='分类表';
 
--- 插入默认分类
-INSERT INTO `t_type` (`name`, `description`) VALUES
-('技术分享', '技术相关的文章'),
-('生活随笔', '日常生活感悟'),
-('读书笔记', '读书心得和笔记'),
-('其他', '其他类型文章');
+-- 插入默认分类（关联到admin用户）
+INSERT INTO `t_type` (`user_id`, `name`, `description`) VALUES
+(1, '技术分享', '技术相关的文章'),
+(1, '生活随笔', '日常生活感悟'),
+(1, '读书笔记', '读书心得和笔记'),
+(1, '其他', '其他类型文章');
 
 -- ============================================
--- 3. 标签表 (t_tag)
+-- 3. 标签表 (t_tag) - 每个用户管理自己的标签
 -- ============================================
 DROP TABLE IF EXISTS `t_tag`;
 CREATE TABLE `t_tag` (
   `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '标签ID',
+  `user_id` BIGINT(20) NOT NULL COMMENT '用户ID',
   `name` VARCHAR(50) NOT NULL COMMENT '标签名称',
   `color` VARCHAR(20) DEFAULT '#409EFF' COMMENT '标签颜色（用于前端展示）',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_name` (`name`)
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_name` (`name`),
+  UNIQUE KEY `uk_user_name` (`user_id`, `name`),
+  CONSTRAINT `fk_tag_user` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='标签表';
 
--- 插入默认标签
-INSERT INTO `t_tag` (`name`, `color`) VALUES
-('Java', '#FF6B6B'),
-('Spring Boot', '#4ECDC4'),
-('Vue', '#45B7D1'),
-('Uni-app', '#96CEB4'),
-('MySQL', '#FFEAA7'),
-('前端', '#DDA0DD'),
-('后端', '#98D8C8');
+-- 插入默认标签（关联到admin用户）
+INSERT INTO `t_tag` (`user_id`, `name`, `color`) VALUES
+(1, 'Java', '#FF6B6B'),
+(1, 'Spring Boot', '#4ECDC4'),
+(1, 'Vue', '#45B7D1'),
+(1, 'MySQL', '#FFEAA7'),
+(1, '前端', '#DDA0DD'),
+(1, '后端', '#98D8C8');
 
 -- ============================================
 -- 4. 博客表 (t_blog)
@@ -116,4 +130,3 @@ CREATE TABLE `t_blog_tags` (
 
 -- 重新启用外键检查
 SET FOREIGN_KEY_CHECKS = 1;
-

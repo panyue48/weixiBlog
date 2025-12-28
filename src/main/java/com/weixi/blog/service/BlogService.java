@@ -15,6 +15,11 @@ public interface BlogService {
     PageResult<BlogVO> getBlogPage(Integer current, Integer size, String keyword, Long typeId, Long tagId, Integer published);
     
     /**
+     * 根据用户ID分页查询博客列表
+     */
+    PageResult<BlogVO> getBlogPageByUserId(Long userId, Integer current, Integer size, String keyword, Long typeId, Long tagId, Integer published);
+    
+    /**
      * 根据ID查询博客详情
      */
     BlogVO getBlogDetail(Long id);

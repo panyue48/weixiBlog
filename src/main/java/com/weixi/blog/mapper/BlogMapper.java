@@ -44,12 +44,32 @@ public interface BlogMapper {
                                 @Param("limit") Integer limit);
     
     /**
+     * 根据用户ID分页查询博客列表（带关联信息）
+     */
+    List<BlogVO> selectBlogPageByUserId(@Param("userId") Long userId,
+                                        @Param("keyword") String keyword,
+                                        @Param("typeId") Long typeId,
+                                        @Param("tagId") Long tagId,
+                                        @Param("published") Integer published,
+                                        @Param("offset") Integer offset,
+                                        @Param("limit") Integer limit);
+    
+    /**
      * 查询总数
      */
     int countBlogs(@Param("keyword") String keyword,
                    @Param("typeId") Long typeId,
                    @Param("tagId") Long tagId,
                    @Param("published") Integer published);
+    
+    /**
+     * 根据用户ID查询总数
+     */
+    int countBlogsByUserId(@Param("userId") Long userId,
+                          @Param("keyword") String keyword,
+                          @Param("typeId") Long typeId,
+                          @Param("tagId") Long tagId,
+                          @Param("published") Integer published);
     
     /**
      * 根据ID查询博客详情（带关联信息）

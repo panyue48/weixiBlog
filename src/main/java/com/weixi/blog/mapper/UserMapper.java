@@ -25,7 +25,7 @@ public interface UserMapper {
     User selectById(Long id);
     
     /**
-     * 根据openid查询用户
+     * 根据用户名查询用户
      */
-    User selectByOpenid(String openid);
+    User selectByUsername(String username);
 }

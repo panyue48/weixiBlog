@@ -10,8 +10,28 @@ import java.util.List;
 public interface TypeService {
     
     /**
-     * 查询所有分类
+     * 根据用户ID查询所有分类
+     */
+    List<Type> getTypesByUserId(Long userId);
+    
+    /**
+     * 查询所有分类（已废弃，保留兼容性）
      */
     List<Type> getAllTypes();
+    
+    /**
+     * 创建分类
+     */
+    Long createType(Long userId, Type type);
+    
+    /**
+     * 更新分类
+     */
+    void updateType(Long id, Long userId, Type type);
+    
+    /**
+     * 删除分类
+     */
+    void deleteType(Long id, Long userId);
 }
 

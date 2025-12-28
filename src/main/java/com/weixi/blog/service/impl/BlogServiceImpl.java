@@ -60,6 +60,36 @@ public class BlogServiceImpl implements BlogService {
     }
     
     @Override
+    public PageResult<BlogVO> getBlogPageByUserId(Long userId, Integer current, Integer size, String keyword, Long typeId, Long tagId, Integer published) {
+        // 计算偏移量
+        Integer offset = (current - 1) * size;
+        
+        // 查询数据
+        List<BlogVO> records = blogMapper.selectBlogPageByUserId(userId, keyword, typeId, tagId, published, offset, size);
+        
+        // 查询总数
+        Long total = (long) blogMapper.countBlogsByUserId(userId, keyword, typeId, tagId, published);
+        
+        // 去重标签（因为LEFT JOIN可能产生重复）
+        records.forEach(blogVO -> {
+            if (blogVO.getTags() != null) {
+                List<com.weixi.blog.vo.TagVO> distinctTags = blogVO.getTags().stream()
+                    .collect(Collectors.toMap(
+                        com.weixi.blog.vo.TagVO::getId,
+                        tag -> tag,
+                        (existing, replacement) -> existing
+                    ))
+                    .values()
+                    .stream()
+                    .collect(Collectors.toList());
+                blogVO.setTags(distinctTags);
+            }
+        });
+        
+        return new PageResult<>(records, total, current, size);
+    }
+    
+    @Override
     public BlogVO getBlogDetail(Long id) {
         BlogVO blogVO = blogMapper.selectBlogDetailById(id);
         if (blogVO != null) {

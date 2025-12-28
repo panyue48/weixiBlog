@@ -1,200 +1,135 @@
-# 微信小程序个人博客系统
+# 个人博客系统
 
-一个完整的微信小程序个人博客系统，包含后端 API 和前端小程序。
-
-## 技术栈
-
-### 后端
-- **框架**: Spring Boot 3.2.0
-- **语言**: Java 17+
-- **ORM**: MyBatis-Plus 3.5.5
-- **数据库**: MySQL 8.0
-- **构建工具**: Maven
-
-### 前端
-- **框架**: Uni-app (Vue 3 Composition API)
-- **UI组件库**: uView UI 2.0
-- **构建工具**: Vite
+一个基于 Spring Boot + Vue 3 的个人博客系统，支持博客文章的展示和管理。
 
 ## 项目结构
 
 ```
 weixiBlog/
-├── blog_db.sql              # 数据库建表脚本
-├── pom.xml                  # Maven配置
-├── src/                     # 后端源码
+├── src/                    # 后端代码（Spring Boot）
 │   └── main/
-│       ├── java/           # Java源码
-│       └── resources/     # 配置文件
-│           ├── application.yml
-│           └── mapper/     # MyBatis XML映射
-├── miniprogram/            # 前端小程序
-│   ├── api/               # API接口封装
-│   ├── pages/             # 页面文件
-│   ├── utils/             # 工具函数
-│   ├── package.json
-│   └── ...
-└── README.md
+│       ├── java/           # Java源代码
+│       └── resources/      # 配置文件
+├── frontend/               # 前端代码（Vue 3）
+├── archive/                # 已隔离的小程序代码
+├── blog_db.sql            # 数据库脚本
+└── pom.xml                # Maven配置
 ```
+
+## 技术栈
+
+### 后端
+- Spring Boot 3.1.4
+- MyBatis
+- MySQL 8.0
+- Spring Security (BCrypt密码加密)
+
+### 前端
+- Vue 3
+- Vue Router
+- Axios
+- Vite
+- Marked (Markdown渲染)
+- Highlight.js (代码高亮)
 
 ## 快速开始
 
-### 1. 数据库初始化
+### 1. 数据库设置
 
-执行 `blog_db.sql` 创建数据库和表：
+执行 `blog_db.sql` 创建数据库和表结构。
 
-```bash
-mysql -u root -p < blog_db.sql
-```
+默认管理员账号：
+- 用户名：admin
+- 密码：admin123
 
-或使用数据库管理工具（如 Navicat、DBeaver）执行 SQL 脚本。
+**注意**：首次使用前，请使用BCrypt工具生成新密码的哈希值并更新数据库。
 
-### 2. 配置后端
+### 2. 后端配置
 
-编辑 `src/main/resources/application.yml`：
+1. 修改 `src/main/resources/application.yml` 中的数据库连接信息
+2. 运行 `BlogApplication.java` 启动后端服务
+3. 后端服务运行在：http://localhost:8083/api
 
-```yaml
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/blog_db?...
-    username: root
-    password: your_password  # 修改为你的MySQL密码
-```
-
-### 3. 启动后端
+### 3. 前端配置
 
 ```bash
-# 使用Maven
-mvn spring-boot:run
-
-# 或使用IDE直接运行 BlogApplication.java
-```
-
-后端服务将运行在：http://localhost:8083/api
-
-### 4. 配置并启动前端
-
-```bash
-cd miniprogram
-
-# 安装依赖
+cd frontend
 npm install
-npm install uview-ui@2.0.36
-
-# 配置后端地址（如需要）
-# 编辑 miniprogram/utils/request.js
-# const BASE_URL = 'http://localhost:8083/api'
-
-# 启动H5预览（推荐）
-npm run dev:h5
-
-# 或启动小程序预览
-npm run dev:mp-weixin
+npm run dev
 ```
 
-访问 http://localhost:8080 即可在浏览器中预览。
+前端服务运行在：http://localhost:3000
 
 ## 功能特性
 
-### ✅ 已实现功能
+### 前台功能
+- ✅ 博客列表展示
+- ✅ 博客详情查看（支持Markdown渲染和代码高亮）
+- ✅ 分类和标签筛选
 
-1. **用户系统**
-   - 微信授权登录
-   - 自动注册
-   - 用户信息管理
+### 后台管理
+- ✅ 用户登录/注销（Session认证）
+- ✅ 个人信息修改
+- ✅ 博客的增删改查（每个用户管理自己的博客）
+- ✅ 分类的增删改查（每个用户管理自己的分类）
+- ✅ 标签的增删改查（每个用户管理自己的标签）
 
-2. **博客管理**
-   - 发布博客（支持Markdown）
-   - 编辑博客
-   - 删除博客
-   - 草稿/发布状态
+## API接口
 
-3. **分类与标签**
-   - 博客分类管理
-   - 多标签支持
-   - 分类/标签筛选
-
-4. **浏览与搜索**
-   - 首页博客列表
-   - 博客详情页
-   - 标题/内容搜索
-   - 分类筛选
-   - 标签筛选
-   - 分页加载
-
-## API 接口
-
-### 用户相关
-- `POST /api/login/wechat` - 微信登录
-
-### 博客相关
-- `GET /api/blog/list` - 获取博客列表（支持分页、搜索、筛选）
+### 前台接口（无需认证）
+- `GET /api/blog/list` - 获取博客列表
 - `GET /api/blog/{id}` - 获取博客详情
-- `POST /api/blog/save` - 发布博客
+
+### 后台接口（需要登录）
+- `POST /api/login/login` - 用户登录
+- `POST /api/login/logout` - 用户注销
+- `GET /api/login/current` - 获取当前用户信息
+
+- `GET /api/user/info` - 获取用户信息
+- `PUT /api/user/info` - 更新用户信息
+- `PUT /api/user/password` - 修改密码
+
+- `GET /api/blog/admin/list` - 获取博客列表（后台）
+- `GET /api/blog/admin/{id}` - 获取博客详情（后台）
+- `POST /api/blog/save` - 创建博客
 - `PUT /api/blog/{id}` - 更新博客
 - `DELETE /api/blog/{id}` - 删除博客
 
-### 分类相关
-- `GET /api/type/list` - 获取所有分类
+- `GET /api/type/admin/list` - 获取分类列表
+- `POST /api/type/save` - 创建分类
+- `PUT /api/type/{id}` - 更新分类
+- `DELETE /api/type/{id}` - 删除分类
 
-### 标签相关
-- `GET /api/tag/list` - 获取所有标签
+- `GET /api/tag/admin/list` - 获取标签列表
+- `POST /api/tag/save` - 创建标签
+- `PUT /api/tag/{id}` - 更新标签
+- `DELETE /api/tag/{id}` - 删除标签
 
-## 开发说明
+## 数据库设计
 
-### 后端开发
+- `t_user` - 用户表
+- `t_blog` - 博客表
+- `t_type` - 分类表（关联用户）
+- `t_tag` - 标签表（关联用户）
+- `t_blog_tags` - 博客标签关联表
 
-- 统一响应格式：`Result<T>`
-- 实体类使用 MyBatis-Plus 注解
-- Service 层处理业务逻辑
-- Controller 层提供 RESTful API
+每个用户只能管理自己的博客、分类和标签。
 
-### 前端开发
+## 开发文档
 
-- 使用 Vue 3 Composition API
-- 网络请求统一封装在 `utils/request.js`
-- API 接口封装在 `api/index.js`
-- 使用 uView UI 组件库
+📖 **详细开发指南请查看：[DEVELOPMENT_GUIDE.md](./DEVELOPMENT_GUIDE.md)**
+
+开发指南包含：
+- 项目架构说明（前后端分离）
+- 启动顺序和操作流程
+- 前后端交互原理
+- 增删改查开发示例
+- 日常开发操作指南
+- 常见问题解答
 
 ## 注意事项
 
-1. **跨域配置**：后端已包含 `CorsConfig.java`，支持跨域请求
-2. **微信登录**：H5环境会自动使用模拟登录，小程序环境需要配置真实 AppID
-3. **图片上传**：当前版本使用URL方式，后续可集成图片上传功能
-4. **Markdown渲染**：当前使用简单正则替换，建议后续集成专业库
-
-## 常见问题
-
-### Q: 数据库连接失败？
-A: 检查 `application.yml` 中的数据库配置，确保MySQL服务已启动。
-
-### Q: 前端无法连接后端？
-A: 
-1. 确认后端服务已启动（http://localhost:8083/api）
-2. 检查 `miniprogram/utils/request.js` 中的 BASE_URL
-3. 确认后端已配置CORS
-
-### Q: uView UI 组件不显示？
-A: 确认已安装 uview-ui：`npm install uview-ui@2.0.36`
-
-### Q: H5预览时登录功能不可用？
-A: H5环境不支持微信登录，代码已自动处理，会使用模拟登录。
-
-## 文档
-
-- [前端快速启动指南](miniprogram/QUICK_START.md)
-- [前端安装说明](miniprogram/INSTALL.md)
-- [前端README](miniprogram/README.md)
-
-## 下一步计划
-
-- [ ] 集成专业的 Markdown 渲染库
-- [ ] 添加图片上传功能
-- [ ] 优化移动端体验
-- [ ] 添加评论功能
-- [ ] 添加点赞/收藏功能
-
-## 许可证
-
-MIT License
-
+1. 小程序相关代码已移动到 `archive/miniprogram_backup` 目录
+2. 使用Session进行用户认证，前端需要设置 `withCredentials: true`
+3. 密码使用BCrypt加密存储
+4. **必须先启动后端，再启动前端**
