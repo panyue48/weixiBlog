@@ -68,7 +68,13 @@
             </if>
             <if test="keyword != null and keyword != ''">
                 AND (b.title LIKE CONCAT('%', #{keyword}, '%') 
-                     OR b.content LIKE CONCAT('%', #{keyword}, '%'))
+                     OR b.content LIKE CONCAT('%', #{keyword}, '%')
+                     OR t.name LIKE CONCAT('%', #{keyword}, '%')
+                     OR EXISTS (
+                         SELECT 1 FROM t_blog_tags bt3
+                         INNER JOIN t_tag tag3 ON bt3.tag_id = tag3.id
+                         WHERE bt3.blog_id = b.id AND tag3.name LIKE CONCAT('%', #{keyword}, '%')
+                     ))
             </if>
             <if test="typeId != null">
                 AND b.type_id = #{typeId}
@@ -90,13 +96,20 @@
     <select id="countBlogs" resultType="int">
         SELECT COUNT(DISTINCT b.id)
         FROM t_blog b
+        LEFT JOIN t_type t ON b.type_id = t.id
         <where>
             <if test="published != null">
                 AND b.published = #{published}
             </if>
             <if test="keyword != null and keyword != ''">
                 AND (b.title LIKE CONCAT('%', #{keyword}, '%') 
-                     OR b.content LIKE CONCAT('%', #{keyword}, '%'))
+                     OR b.content LIKE CONCAT('%', #{keyword}, '%')
+                     OR t.name LIKE CONCAT('%', #{keyword}, '%')
+                     OR EXISTS (
+                         SELECT 1 FROM t_blog_tags bt3
+                         INNER JOIN t_tag tag3 ON bt3.tag_id = tag3.id
+                         WHERE bt3.blog_id = b.id AND tag3.name LIKE CONCAT('%', #{keyword}, '%')
+                     ))
             </if>
             <if test="typeId != null">
                 AND b.type_id = #{typeId}
@@ -141,7 +154,13 @@
             </if>
             <if test="keyword != null and keyword != ''">
                 AND (b.title LIKE CONCAT('%', #{keyword}, '%') 
-                     OR b.content LIKE CONCAT('%', #{keyword}, '%'))
+                     OR b.content LIKE CONCAT('%', #{keyword}, '%')
+                     OR t.name LIKE CONCAT('%', #{keyword}, '%')
+                     OR EXISTS (
+                         SELECT 1 FROM t_blog_tags bt3
+                         INNER JOIN t_tag tag3 ON bt3.tag_id = tag3.id
+                         WHERE bt3.blog_id = b.id AND tag3.name LIKE CONCAT('%', #{keyword}, '%')
+                     ))
             </if>
             <if test="typeId != null">
                 AND b.type_id = #{typeId}
@@ -163,6 +182,7 @@
     <select id="countBlogsByUserId" resultType="int">
         SELECT COUNT(DISTINCT b.id)
         FROM t_blog b
+        LEFT JOIN t_type t ON b.type_id = t.id
         <where>
             AND b.user_id = #{userId}
             <if test="published != null">
@@ -170,7 +190,13 @@
             </if>
             <if test="keyword != null and keyword != ''">
                 AND (b.title LIKE CONCAT('%', #{keyword}, '%') 
-                     OR b.content LIKE CONCAT('%', #{keyword}, '%'))
+                     OR b.content LIKE CONCAT('%', #{keyword}, '%')
+                     OR t.name LIKE CONCAT('%', #{keyword}, '%')
+                     OR EXISTS (
+                         SELECT 1 FROM t_blog_tags bt3
+                         INNER JOIN t_tag tag3 ON bt3.tag_id = tag3.id
+                         WHERE bt3.blog_id = b.id AND tag3.name LIKE CONCAT('%', #{keyword}, '%')
+                     ))
             </if>
             <if test="typeId != null">
                 AND b.type_id = #{typeId}
