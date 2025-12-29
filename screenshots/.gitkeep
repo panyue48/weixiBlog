@@ -1,0 +1,21 @@
+# Screenshots Directory
+
+此文件夹用于存放项目功能截图。
+
+## 截图文件列表
+
+- `home.png` - 首页展示
+- `blog-detail.png` - 博客详情页
+- `types.png` - 分类页面
+- `tags.png` - 标签页面
+- `archive.png` - 归档页面
+- `about.png` - 关于我页面
+- `admin-login.png` - 后台登录页
+- `admin-blogs.png` - 博客管理页面
+- `admin-blog-edit.png` - 博客编辑页面
+- `admin-types.png` - 分类管理页面
+- `admin-tags.png` - 标签管理页面
+- `admin-profile.png` - 个人信息页面
+
+请将对应的截图文件放置在此目录中。
+
