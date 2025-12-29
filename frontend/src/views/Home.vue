@@ -166,9 +166,9 @@ export default {
   },
   watch: {
     '$route'(to, from) {
-      // 路由变化时重置筛选条件
+      // 路由变化时从路由参数读取筛选条件
       if (to.path === '/') {
-        this.resetFilters()
+        this.loadFiltersFromRoute()
         this.loadBlogs()
       }
     }
@@ -176,22 +176,12 @@ export default {
   mounted() {
     this.loadTypes()
     this.loadTags()
+    
+    // 先从路由参数获取筛选条件
+    this.loadFiltersFromRoute()
+    
+    // 然后加载博客（此时筛选条件已设置）
     this.loadBlogs()
-    
-    // 从路由参数获取筛选条件
-    const typeId = this.$route.query.typeId
-    const tagId = this.$route.query.tagId
-    const keyword = this.$route.query.keyword
-    
-    if (typeId) {
-      this.activeTypeId = parseInt(typeId)
-    }
-    if (tagId) {
-      this.activeTagId = parseInt(tagId)
-    }
-    if (keyword) {
-      this.searchKeyword = keyword
-    }
   },
   methods: {
     async loadBlogs() {
@@ -242,15 +232,25 @@ export default {
       }
     },
     filterByType(typeId) {
-      this.activeTypeId = this.activeTypeId === typeId ? null : typeId
-      this.activeTagId = null
+      // 如果点击的是当前已激活的分类，则取消筛选；否则应用筛选
+      if (this.activeTypeId === typeId) {
+        this.activeTypeId = null
+      } else {
+        this.activeTypeId = typeId
+      }
+      this.activeTagId = null // 分类和标签互斥
       this.currentPage = 1
       this.updateRoute()
       this.loadBlogs()
     },
     filterByTag(tagId) {
-      this.activeTagId = this.activeTagId === tagId ? null : tagId
-      this.activeTypeId = null
+      // 如果点击的是当前已激活的标签，则取消筛选；否则应用筛选
+      if (this.activeTagId === tagId) {
+        this.activeTagId = null
+      } else {
+        this.activeTagId = tagId
+      }
+      this.activeTypeId = null // 分类和标签互斥
       this.currentPage = 1
       this.updateRoute()
       this.loadBlogs()
@@ -276,6 +276,18 @@ export default {
         query.tagId = this.activeTagId
       }
       this.$router.push({ path: '/', query })
+    },
+    loadFiltersFromRoute() {
+      // 从路由参数获取筛选条件
+      const typeId = this.$route.query.typeId
+      const tagId = this.$route.query.tagId
+      const keyword = this.$route.query.keyword
+      
+      // 设置筛选条件
+      this.activeTypeId = typeId ? parseInt(typeId) : null
+      this.activeTagId = tagId ? parseInt(tagId) : null
+      this.searchKeyword = keyword || ''
+      this.currentPage = 1
     },
     resetFilters() {
       this.activeTypeId = null
