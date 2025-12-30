@@ -1,3 +1,4 @@
+c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\controller\ApiUserController.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\dto\BlogDTO.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\entity\Blog.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\service\impl\TagServiceImpl.java
@@ -14,12 +15,18 @@ c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\mapper\UserMapper.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\mapper\TagMapper.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\service\BlogService.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\common\PageResult.java
+c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\interceptor\AuthInterceptor.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\service\impl\BlogServiceImpl.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\entity\Tag.java
+c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\util\DatabaseConnectionTest.java
+c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\config\DatabaseHealthCheck.java
+c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\config\WebConfig.java
+c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\dto\UserUpdateDTO.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\service\TagService.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\dto\LoginDTO.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\controller\ApiLoginController.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\service\UserService.java
+c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\config\RedisConfig.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\BlogApplication.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\vo\BlogVO.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\vo\TagVO.java
@@ -28,4 +35,5 @@ c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\entity\User.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\controller\ApiBlogController.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\mapper\BlogTagsMapper.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\service\impl\TypeServiceImpl.java
+c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\util\PasswordGenerator.java
 c:\cursorworkplace\weixiBlog\src\main\java\com\weixi\blog\controller\ApiTagController.java

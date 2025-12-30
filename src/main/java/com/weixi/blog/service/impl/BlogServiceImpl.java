@@ -10,6 +10,8 @@ import com.weixi.blog.vo.BlogVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +32,11 @@ public class BlogServiceImpl implements BlogService {
     private BlogTagsMapper blogTagsMapper;
     
     @Override
+    @Cacheable(value = "blogList", key = "#current + '_' + #size + '_' + (#keyword != null ? #keyword : '') + '_' + (#typeId != null ? #typeId : '') + '_' + (#tagId != null ? #tagId : '') + '_' + #published")
     public PageResult<BlogVO> getBlogPage(Integer current, Integer size, String keyword, Long typeId, Long tagId, Integer published) {
+        log.info("查询博客列表 - 从数据库加载: current={}, size={}, keyword={}, typeId={}, tagId={}, published={}", 
+                current, size, keyword, typeId, tagId, published);
+        
         // 计算偏移量
         Integer offset = (current - 1) * size;
         
@@ -90,7 +96,10 @@ public class BlogServiceImpl implements BlogService {
     }
     
     @Override
+    @Cacheable(value = "blogDetail", key = "#id")
     public BlogVO getBlogDetail(Long id) {
+        log.info("查询博客详情 - 从数据库加载: id={}", id);
+        
         BlogVO blogVO = blogMapper.selectBlogDetailById(id);
         if (blogVO != null) {
             // 去重标签（因为LEFT JOIN可能产生重复）
@@ -112,6 +121,7 @@ public class BlogServiceImpl implements BlogService {
     
     @Override
     @Transactional
+    @CacheEvict(value = {"blogList", "blogDetail"}, allEntries = true)
     public Long saveBlog(BlogDTO blogDTO, Long userId) {
         Blog blog = new Blog();
         BeanUtils.copyProperties(blogDTO, blog);
@@ -128,11 +138,13 @@ public class BlogServiceImpl implements BlogService {
             blogTagsMapper.insertBatch(blog.getId(), blogDTO.getTagIds());
         }
         
+        log.info("新增博客，清除缓存: id={}", blog.getId());
         return blog.getId();
     }
     
     @Override
     @Transactional
+    @CacheEvict(value = {"blogList", "blogDetail"}, allEntries = true)
     public void updateBlog(Long id, BlogDTO blogDTO, Long userId) {
         Blog blog = blogMapper.selectById(id);
         if (blog == null) {
@@ -153,10 +165,13 @@ public class BlogServiceImpl implements BlogService {
         if (blogDTO.getTagIds() != null && !blogDTO.getTagIds().isEmpty()) {
             blogTagsMapper.insertBatch(id, blogDTO.getTagIds());
         }
+        
+        log.info("更新博客，清除缓存: id={}", id);
     }
     
     @Override
     @Transactional
+    @CacheEvict(value = {"blogList", "blogDetail"}, allEntries = true)
     public void deleteBlog(Long id, Long userId) {
         Blog blog = blogMapper.selectById(id);
         if (blog == null) {
@@ -171,6 +186,8 @@ public class BlogServiceImpl implements BlogService {
         
         // 删除博客
         blogMapper.deleteById(id);
+        
+        log.info("删除博客，清除缓存: id={}", id);
     }
     
     @Override
