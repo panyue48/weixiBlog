@@ -24,7 +24,7 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
 
-  # Redis配置
+  # Redis配置（可选，如果 Redis 不可用会自动降级为直接查询数据库）
   data:
     redis:
       host: localhost
@@ -38,6 +38,7 @@ spring:
           max-idle: 8
           min-idle: 0
           max-wait: -1ms
+        shutdown-timeout: 100ms
 
 # MyBatis配置
 mybatis:
