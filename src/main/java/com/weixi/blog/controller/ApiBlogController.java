@@ -22,12 +22,13 @@ public class ApiBlogController {
     private BlogService blogService;
     
     /**
-     * 分页查询博客列表（前台，只显示已发布的）
+     * 分页查询博客列表（前台）
      * @param current 当前页，默认1
      * @param size 每页数量，默认10
      * @param keyword 搜索关键词（标题/内容）
      * @param typeId 分类ID
      * @param tagId 标签ID
+     * @param session HTTP会话，用于获取当前登录用户信息
      */
     @GetMapping("/list")
     public Result<PageResult<BlogVO>> getBlogList(
@@ -35,10 +36,18 @@ public class ApiBlogController {
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long typeId,
-            @RequestParam(required = false) Long tagId) {
+            @RequestParam(required = false) Long tagId,
+            HttpSession session) {
         try {
-            // 前台只显示已发布的博客
-            PageResult<BlogVO> page = blogService.getBlogPage(current, size, keyword, typeId, tagId, 1);
+            Long userId = (Long) session.getAttribute("userId");
+            PageResult<BlogVO> page;
+            if (userId != null) {
+                // 已登录：只显示自己的已发布博客
+                page = blogService.getBlogPageByUserId(userId, current, size, keyword, typeId, tagId, 1);
+            } else {
+                // 未登录：返回空列表，不显示任何博客
+                page = new PageResult<>(new java.util.ArrayList<>(), 0L, current, size);
+            }
             return Result.success(page);
         } catch (Exception e) {
             log.error("查询博客列表失败", e);
@@ -48,18 +57,30 @@ public class ApiBlogController {
     
     /**
      * 查询博客详情（前台）
+     * @param id 博客ID
+     * @param session HTTP会话，用于获取当前登录用户信息
      */
     @GetMapping("/{id}")
-    public Result<BlogVO> getBlogDetail(@PathVariable Long id) {
+    public Result<BlogVO> getBlogDetail(@PathVariable Long id, HttpSession session) {
         try {
             BlogVO blogVO = blogService.getBlogDetail(id);
             if (blogVO == null) {
                 return Result.error("博客不存在");
             }
-            // 只显示已发布的博客
-            if (blogVO.getPublished() == null || blogVO.getPublished() != 1) {
-                return Result.error("博客不存在");
+            
+            Long userId = (Long) session.getAttribute("userId");
+            if (userId != null) {
+                // 已登录：只能查看自己的博客（包括草稿和已发布的）
+                if (!blogVO.getUserId().equals(userId)) {
+                    return Result.error("无权访问此博客");
+                }
+            } else {
+                // 未登录：只能查看已发布的博客
+                if (blogVO.getPublished() == null || blogVO.getPublished() != 1) {
+                    return Result.error("博客不存在");
+                }
             }
+            
             // 增加浏览量
             blogService.incrementViews(id);
             return Result.success(blogVO);

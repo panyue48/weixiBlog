@@ -7,6 +7,7 @@ import Types from '../views/Types.vue'
 import Tags from '../views/Tags.vue'
 import About from '../views/About.vue'
 import AdminLogin from '../views/admin/Login.vue'
+import AdminRegister from '../views/admin/Register.vue'
 import AdminDashboard from '../views/admin/Dashboard.vue'
 import AdminBlogList from '../views/admin/BlogList.vue'
 import AdminBlogEdit from '../views/admin/BlogEdit.vue'
@@ -49,6 +50,11 @@ const routes = [
     path: '/admin/login',
     name: 'AdminLogin',
     component: AdminLogin
+  },
+  {
+    path: '/admin/register',
+    name: 'AdminRegister',
+    component: AdminRegister
   },
   {
     path: '/admin',

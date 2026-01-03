@@ -2,6 +2,7 @@ package com.weixi.blog.controller;
 
 import com.weixi.blog.common.Result;
 import com.weixi.blog.dto.LoginDTO;
+import com.weixi.blog.dto.RegisterDTO;
 import com.weixi.blog.service.UserService;
 import com.weixi.blog.vo.UserVO;
 import jakarta.servlet.http.HttpSession;
@@ -19,6 +20,30 @@ public class ApiLoginController {
     
     @Autowired
     private UserService userService;
+    
+    /**
+     * 用户注册
+     */
+    @PostMapping("/register")
+    public Result<UserVO> register(@RequestBody RegisterDTO registerDTO, HttpSession session) {
+        try {
+            UserVO userVO = userService.register(
+                registerDTO.getUsername(),
+                registerDTO.getPassword(),
+                registerDTO.getNickname(),
+                registerDTO.getEmail()
+            );
+            
+            // 注册成功后自动登录，将用户信息存入Session
+            session.setAttribute("userId", userVO.getId());
+            session.setAttribute("username", userVO.getUsername());
+            
+            return Result.success("注册成功", userVO);
+        } catch (Exception e) {
+            log.error("注册失败", e);
+            return Result.error("注册失败: " + e.getMessage());
+        }
+    }
     
     /**
      * 用户登录

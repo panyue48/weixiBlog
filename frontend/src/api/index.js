@@ -37,6 +37,7 @@ api.interceptors.response.use(
 
 // 用户相关API
 export const userApi = {
+  register: (data) => api.post('/login/register', data),
   login: (data) => api.post('/login/login', data),
   logout: () => api.post('/login/logout'),
   getCurrentUser: () => api.get('/login/current'),

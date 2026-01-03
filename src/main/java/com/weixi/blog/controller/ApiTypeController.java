@@ -22,12 +22,21 @@ public class ApiTypeController {
     private TypeService typeService;
     
     /**
-     * 前台：查询所有分类（已废弃，保留兼容性）
+     * 前台：查询分类列表
+     * @param session HTTP会话，用于获取当前登录用户信息
      */
     @GetMapping("/list")
-    public Result<List<Type>> getAllTypes() {
+    public Result<List<Type>> getAllTypes(HttpSession session) {
         try {
-            List<Type> types = typeService.getAllTypes();
+            Long userId = (Long) session.getAttribute("userId");
+            List<Type> types;
+            if (userId != null) {
+                // 已登录：只返回自己的分类
+                types = typeService.getTypesByUserId(userId);
+            } else {
+                // 未登录：返回所有分类
+                types = typeService.getAllTypes();
+            }
             return Result.success(types);
         } catch (Exception e) {
             log.error("查询分类列表失败", e);

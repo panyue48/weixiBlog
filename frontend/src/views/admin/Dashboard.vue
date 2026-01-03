@@ -18,8 +18,8 @@
           <span>👤</span> 个人信息
         </router-link>
       </nav>
-      <div class="logout">
-        <button @click="handleLogout" class="btn btn-danger">退出登录</button>
+      <div class="back-home">
+        <button @click="handleBackHome" class="btn btn-primary">回到首页</button>
       </div>
     </aside>
     
@@ -61,16 +61,9 @@ export default {
     }
   },
   methods: {
-    async handleLogout() {
-      try {
-        await userApi.logout()
-        sessionStorage.clear()
-        this.$router.push('/admin/login')
-      } catch (error) {
-        console.error('退出登录失败', error)
-        sessionStorage.clear()
-        this.$router.push('/admin/login')
-      }
+    handleBackHome() {
+      // 回到首页
+      this.$router.push('/')
     }
   }
 }
@@ -129,13 +122,27 @@ export default {
   margin-right: 8px;
 }
 
-.logout {
+.back-home {
   padding: 20px;
   border-top: 1px solid #eee;
 }
 
-.logout .btn {
+.back-home .btn {
   width: 100%;
+}
+
+.btn-primary {
+  background-color: #409EFF;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #66b1ff;
 }
 
 .main-content {

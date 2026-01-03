@@ -33,5 +33,10 @@ public interface UserService {
      * 修改密码
      */
     void changePassword(Long userId, String oldPassword, String newPassword);
+    
+    /**
+     * 用户注册
+     */
+    UserVO register(String username, String password, String nickname, String email);
 }
 

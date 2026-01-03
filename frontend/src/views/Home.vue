@@ -11,31 +11,71 @@
           <router-link to="/archive" :class="{ active: $route.path === '/archive' }">归档</router-link>
           <router-link to="/about" :class="{ active: $route.path === '/about' }">关于我</router-link>
         </nav>
-        <div class="search-box">
-          <input 
-            v-model="searchKeyword" 
-            type="text" 
-            placeholder="Search..." 
-            @keyup.enter="handleSearch"
-            @input="handleSearchInput"
-          />
-          <span class="search-icon" @click="handleSearch">🔍</span>
+        <div class="header-right">
+          <div class="search-box">
+            <input 
+              v-model="searchKeyword" 
+              type="text" 
+              placeholder="Search..." 
+              @keyup.enter="handleSearch"
+              @input="handleSearchInput"
+            />
+            <span class="search-icon" @click="handleSearch">🔍</span>
+          </div>
+          <!-- 用户信息区域 -->
+          <div v-if="isLoggedIn" class="user-info">
+            <button @click="handleLogout" class="logout-btn">退出登录</button>
+            <router-link to="/admin" class="admin-btn">管理后台</router-link>
+          </div>
         </div>
       </div>
     </header>
 
     <!-- 主内容区 -->
     <main class="container main-content">
-      <!-- 左侧：博客列表 -->
-      <div class="content-area">
-        <div class="content-header">
-          <h2>博客</h2>
-          <span class="blog-count">共{{ total }}篇</span>
+      <!-- 未登录时显示登录指引 -->
+      <div v-if="!isLoggedIn" class="login-guide">
+        <div class="guide-content">
+          <div class="guide-icon">📝</div>
+          <h2>欢迎来到博客系统</h2>
+          <p class="guide-text">请登录以查看和管理您的个人博客文档</p>
+          <div class="guide-features">
+            <div class="feature-item">
+              <span class="feature-icon">✍️</span>
+              <span>创建和编辑您的博客</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">📚</span>
+              <span>管理您的文档分类</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">🏷️</span>
+              <span>添加标签和分类</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">🔒</span>
+              <span>安全的个人空间</span>
+            </div>
+          </div>
+          <div class="guide-buttons">
+            <router-link to="/admin/login" class="guide-login-btn">立即登录</router-link>
+            <router-link to="/admin/register" class="guide-register-btn">注册账号</router-link>
+          </div>
         </div>
-        
-        <div v-if="loading" class="loading">加载中...</div>
-        <div v-else-if="blogs.length === 0" class="empty">暂无博客</div>
-        <div v-else class="blog-cards">
+      </div>
+      
+      <!-- 已登录时显示博客列表 -->
+      <template v-else>
+        <!-- 左侧：博客列表 -->
+        <div class="content-area">
+          <div class="content-header">
+            <h2>我的博客</h2>
+            <span class="blog-count">共{{ total }}篇</span>
+          </div>
+          
+          <div v-if="loading" class="loading">加载中...</div>
+          <div v-else-if="blogs.length === 0" class="empty">暂无博客，开始创建您的第一篇博客吧！</div>
+          <div v-else class="blog-cards">
           <div 
             v-for="blog in blogs" 
             :key="blog.id" 
@@ -87,61 +127,62 @@
           </div>
         </div>
 
-        <!-- 分页 -->
-        <div class="pagination" v-if="total > pageSize">
-          <button @click="prevPage" :disabled="currentPage === 1" class="btn">上一页</button>
-          <span>第 {{ currentPage }} / {{ totalPages }} 页</span>
-          <button @click="nextPage" :disabled="currentPage === totalPages" class="btn">下一页</button>
-        </div>
-      </div>
-
-      <!-- 右侧：侧边栏 -->
-      <aside class="sidebar">
-        <!-- 分类 -->
-        <div class="sidebar-section">
-          <div class="section-header">
-            <h3>分类</h3>
-            <router-link to="/types" class="more-link">more >></router-link>
+          <!-- 分页 -->
+          <div class="pagination" v-if="total > pageSize">
+            <button @click="prevPage" :disabled="currentPage === 1" class="btn">上一页</button>
+            <span>第 {{ currentPage }} / {{ totalPages }} 页</span>
+            <button @click="nextPage" :disabled="currentPage === totalPages" class="btn">下一页</button>
           </div>
-          <ul class="category-list">
-            <li 
-              v-for="type in types" 
-              :key="type.id"
-              :class="{ active: activeTypeId === type.id }"
-              @click="filterByType(type.id)"
-            >
-              <span class="category-name">{{ type.name }}</span>
-              <span class="category-count">{{ type.blogCount || 0 }}</span>
-            </li>
-          </ul>
         </div>
 
-        <!-- 标签 -->
-        <div class="sidebar-section">
-          <div class="section-header">
-            <h3>标签</h3>
-            <router-link to="/tags" class="more-link">more >></router-link>
+        <!-- 右侧：侧边栏 -->
+        <aside class="sidebar">
+          <!-- 分类 -->
+          <div class="sidebar-section">
+            <div class="section-header">
+              <h3>分类</h3>
+              <router-link to="/types" class="more-link">more >></router-link>
+            </div>
+            <ul class="category-list">
+              <li 
+                v-for="type in types" 
+                :key="type.id"
+                :class="{ active: activeTypeId === type.id }"
+                @click="filterByType(type.id)"
+              >
+                <span class="category-name">{{ type.name }}</span>
+                <span class="category-count">{{ type.blogCount || 0 }}</span>
+              </li>
+            </ul>
           </div>
-          <div class="tag-cloud">
-            <span 
-              v-for="tag in tags" 
-              :key="tag.id"
-              class="tag-item"
-              :style="{ backgroundColor: tag.color }"
-              :class="{ active: activeTagId === tag.id }"
-              @click="filterByTag(tag.id)"
-            >
-              {{ tag.name }}
-            </span>
+
+          <!-- 标签 -->
+          <div class="sidebar-section">
+            <div class="section-header">
+              <h3>标签</h3>
+              <router-link to="/tags" class="more-link">more >></router-link>
+            </div>
+            <div class="tag-cloud">
+              <span 
+                v-for="tag in tags" 
+                :key="tag.id"
+                class="tag-item"
+                :style="{ backgroundColor: tag.color }"
+                :class="{ active: activeTagId === tag.id }"
+                @click="filterByTag(tag.id)"
+              >
+                {{ tag.name }}
+              </span>
+            </div>
           </div>
-        </div>
-      </aside>
+        </aside>
+      </template>
     </main>
   </div>
 </template>
 
 <script>
-import { blogApi, typeApi, tagApi } from '../api'
+import { blogApi, typeApi, tagApi, userApi } from '../api'
 
 export default {
   name: 'Home',
@@ -156,7 +197,9 @@ export default {
       loading: false,
       searchKeyword: '',
       activeTypeId: null,
-      activeTagId: null
+      activeTagId: null,
+      isLoggedIn: false,
+      currentUsername: ''
     }
   },
   computed: {
@@ -174,16 +217,61 @@ export default {
     }
   },
   mounted() {
+    this.checkLoginStatus()
     this.loadTypes()
     this.loadTags()
     
     // 先从路由参数获取筛选条件
     this.loadFiltersFromRoute()
     
-    // 然后加载博客（此时筛选条件已设置）
-    this.loadBlogs()
+    // 如果已登录，加载博客（此时筛选条件已设置）
+    if (this.isLoggedIn) {
+      this.loadBlogs()
+    }
   },
   methods: {
+    async checkLoginStatus() {
+      const userId = sessionStorage.getItem('userId')
+      const username = sessionStorage.getItem('username')
+      if (userId && username) {
+        this.isLoggedIn = true
+        this.currentUsername = username
+        // 验证登录状态是否有效
+        try {
+          await userApi.getCurrentUser()
+        } catch (error) {
+          // 登录已过期，清除本地存储
+          this.isLoggedIn = false
+          this.currentUsername = ''
+          sessionStorage.removeItem('userId')
+          sessionStorage.removeItem('username')
+        }
+      } else {
+        this.isLoggedIn = false
+        this.currentUsername = ''
+      }
+    },
+    async handleLogout() {
+      try {
+        await userApi.logout()
+        sessionStorage.removeItem('userId')
+        sessionStorage.removeItem('username')
+        this.isLoggedIn = false
+        this.currentUsername = ''
+        this.blogs = []
+        this.total = 0
+        this.$router.push('/')
+      } catch (error) {
+        console.error('退出登录失败', error)
+        // 即使API失败，也清除本地存储
+        sessionStorage.removeItem('userId')
+        sessionStorage.removeItem('username')
+        this.isLoggedIn = false
+        this.currentUsername = ''
+        this.blogs = []
+        this.total = 0
+      }
+    },
     async loadBlogs() {
       this.loading = true
       try {
@@ -351,6 +439,60 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.username {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+}
+
+.logout-btn, .admin-btn, .login-link {
+  padding: 6px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s;
+}
+
+.logout-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.admin-btn {
+  background: #17a2b8;
+  color: white;
+}
+
+.admin-btn:hover {
+  background: #138496;
+}
+
+.login-link {
+  background: #17a2b8;
+  color: white;
+}
+
+.login-link:hover {
+  background: #138496;
 }
 
 .logo {
@@ -673,6 +815,104 @@ export default {
   text-align: center;
   padding: 50px;
   color: #666;
+}
+
+/* 登录指引样式 */
+.login-guide {
+  width: 100%;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.guide-content {
+  max-width: 600px;
+  text-align: center;
+  background: white;
+  padding: 60px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.guide-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+}
+
+.guide-content h2 {
+  font-size: 28px;
+  color: #333;
+  margin: 0 0 15px 0;
+  font-weight: 600;
+}
+
+.guide-text {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+.guide-features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+  text-align: left;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+.feature-icon {
+  font-size: 20px;
+}
+
+.guide-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.guide-login-btn, .guide-register-btn {
+  display: inline-block;
+  padding: 14px 40px;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.guide-login-btn {
+  background: #409EFF;
+}
+
+.guide-login-btn:hover {
+  background: #66b1ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+}
+
+.guide-register-btn {
+  background: #67C23A;
+}
+
+.guide-register-btn:hover {
+  background: #85ce61;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
 }
 
 /* 响应式设计 */

@@ -1,28 +1,28 @@
 <template>
-  <div class="login-page">
-    <div class="login-layout">
+  <div class="register-page">
+    <div class="register-layout">
       <!-- 左侧图片区域 -->
-      <div class="login-left">
+      <div class="register-left">
         <div class="image-container">
-          <img src="https://picsum.photos/800/600" alt="博客管理" class="login-image" />
+          <img src="https://picsum.photos/800/600" alt="博客注册" class="register-image" />
           <div class="image-overlay">
-            <p>创作您的故事，分享您的世界。</p>
-            <p>博客管理</p>
+            <p>加入我们，开始您的创作之旅。</p>
+            <p>博客注册</p>
           </div>
         </div>
       </div>
 
-      <!-- 右侧登录表单区域 -->
-      <div class="login-right">
-        <div class="login-container">
+      <!-- 右侧注册表单区域 -->
+      <div class="register-right">
+        <div class="register-container">
           <!-- Logo -->
           <div class="logo-section">
             <div class="logo-icon">💬</div>
             <h1 class="logo-text">BLOG PRESS</h1>
           </div>
 
-          <!-- 登录表单 -->
-          <form @submit.prevent="handleLogin" class="login-form">
+          <!-- 注册表单 -->
+          <form @submit.prevent="handleRegister" class="register-form">
             <div class="form-group">
               <div class="input-wrapper">
                 <span class="input-icon">👤</span>
@@ -30,7 +30,7 @@
                   v-model="form.username" 
                   type="text" 
                   required 
-                  placeholder="用户名/邮箱" 
+                  placeholder="用户名" 
                   class="form-input"
                 />
               </div>
@@ -45,6 +45,7 @@
                   required 
                   placeholder="密码" 
                   class="form-input"
+                  minlength="6"
                 />
                 <span class="password-toggle" @click="togglePasswordVisibility">
                   {{ showPassword ? '👁️' : '👁️‍🗨️' }}
@@ -52,32 +53,55 @@
               </div>
             </div>
 
-            <div v-if="error" class="error-message">{{ error }}</div>
-
-            <div class="form-options">
-              <label class="remember-me">
-                <input type="checkbox" v-model="form.rememberMe" />
-                <span>记住我</span>
-              </label>
-              <a href="#" class="forgot-password" @click.prevent="handleForgotPassword">
-                忘记密码?
-              </a>
+            <div class="form-group">
+              <div class="input-wrapper">
+                <span class="input-icon">🔒</span>
+                <input 
+                  v-model="form.confirmPassword" 
+                  type="password" 
+                  required 
+                  placeholder="确认密码" 
+                  class="form-input"
+                  minlength="6"
+                />
+              </div>
             </div>
 
-            <button type="submit" class="btn btn-login" :disabled="loading">
-              {{ loading ? '登录中...' : '登录' }}
+            <div class="form-group">
+              <div class="input-wrapper">
+                <span class="input-icon">✏️</span>
+                <input 
+                  v-model="form.nickname" 
+                  type="text" 
+                  placeholder="昵称（可选）" 
+                  class="form-input"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="input-wrapper">
+                <span class="input-icon">📧</span>
+                <input 
+                  v-model="form.email" 
+                  type="email" 
+                  placeholder="邮箱（可选）" 
+                  class="form-input"
+                />
+              </div>
+            </div>
+
+            <div v-if="error" class="error-message">{{ error }}</div>
+
+            <button type="submit" class="btn btn-register" :disabled="loading">
+              {{ loading ? '注册中...' : '注册' }}
             </button>
           </form>
 
-          <!-- 返回博客链接和注册链接 -->
-          <div class="back-links">
-            <div class="back-to-blog">
-              <a href="/" @click.prevent="$router.push('/')">返回博客</a>
-            </div>
-            <div class="register-link">
-              <span>还没有账号？</span>
-              <router-link to="/admin/register">立即注册</router-link>
-            </div>
+          <!-- 返回登录链接 -->
+          <div class="back-to-login">
+            <span>已有账号？</span>
+            <router-link to="/admin/login">立即登录</router-link>
           </div>
         </div>
       </div>
@@ -89,13 +113,15 @@
 import { userApi } from '../../api'
 
 export default {
-  name: 'AdminLogin',
+  name: 'AdminRegister',
   data() {
     return {
       form: {
         username: '',
         password: '',
-        rememberMe: false
+        confirmPassword: '',
+        nickname: '',
+        email: ''
       },
       loading: false,
       error: '',
@@ -103,61 +129,70 @@ export default {
     }
   },
   methods: {
-    async handleLogin() {
+    async handleRegister() {
+      // 验证密码
+      if (this.form.password !== this.form.confirmPassword) {
+        this.error = '两次输入的密码不一致'
+        return
+      }
+
+      if (this.form.password.length < 6) {
+        this.error = '密码长度至少为6位'
+        return
+      }
+
       this.loading = true
       this.error = ''
-      this.loginSuccess = false
+      this.registerSuccess = false
       try {
-        const user = await userApi.login(this.form)
+        const user = await userApi.register({
+          username: this.form.username,
+          password: this.form.password,
+          nickname: this.form.nickname || null,
+          email: this.form.email || null
+        })
         sessionStorage.setItem('userId', user.id)
         sessionStorage.setItem('username', user.username)
-        if (this.form.rememberMe) {
-          localStorage.setItem('rememberMe', 'true')
-        }
-        // 登录成功后直接跳转到首页
+        // 注册成功后直接跳转到首页
         this.$router.push('/')
       } catch (error) {
-        this.error = error.message || '登录失败，请检查用户名和密码'
-        this.loginSuccess = false
+        this.error = error.message || '注册失败，请检查输入信息'
+        this.registerSuccess = false
       } finally {
         this.loading = false
       }
     },
     togglePasswordVisibility() {
-      const passwordInput = this.$el.querySelector('input[type="password"]')
-      if (passwordInput) {
-        if (passwordInput.type === 'password') {
-          passwordInput.type = 'text'
-          this.showPassword = true
+      this.showPassword = !this.showPassword
+      const passwordInputs = this.$el.querySelectorAll('input[type="password"]')
+      passwordInputs.forEach(input => {
+        if (this.showPassword) {
+          input.type = 'text'
         } else {
-          passwordInput.type = 'password'
-          this.showPassword = false
+          input.type = 'password'
         }
-      }
-    },
-    handleForgotPassword() {
-      alert('忘记密码功能暂未开放')
+      })
     }
   }
 }
 </script>
 
 <style scoped>
-.login-page {
+.register-page {
   min-height: 100vh;
   display: flex;
   background-color: #fff;
   overflow: hidden;
 }
 
-.login-layout {
+.register-layout {
   display: flex;
   width: 100%;
   min-height: 100vh;
 }
 
 /* 左侧图片区域 */
-.login-left {
+.register-left {
   flex: 1;
   position: relative;
   display: none;
@@ -170,7 +205,7 @@ export default {
   overflow: hidden;
 }
 
-.login-image {
+.register-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -197,8 +232,8 @@ export default {
   margin-bottom: 5px;
 }
 
-/* 右侧登录表单区域 */
-.login-right {
+/* 右侧注册表单区域 */
+.register-right {
   flex: 1;
   display: flex;
   align-items: center;
@@ -208,7 +243,7 @@ export default {
   min-height: 100vh;
 }
 
-.login-container {
+.register-container {
   width: 100%;
   max-width: 420px;
 }
@@ -243,7 +278,7 @@ export default {
 }
 
 /* 表单样式 */
-.login-form {
+.register-form {
   width: 100%;
 }
 
@@ -304,40 +339,7 @@ export default {
   border-left: 3px solid #F56C6C;
 }
 
-.form-options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.remember-me {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  font-size: 14px;
-  color: #606266;
-}
-
-.remember-me input {
-  margin-right: 8px;
-  cursor: pointer;
-  width: 16px;
-  height: 16px;
-}
-
-.forgot-password {
-  color: #409EFF;
-  font-size: 14px;
-  text-decoration: none;
-  transition: color 0.3s;
-}
-
-.forgot-password:hover {
-  color: #66b1ff;
-}
-
-.btn-login {
+.btn-register {
   width: 100%;
   padding: 14px;
   background-color: rgba(119, 175, 35, 1);
@@ -347,55 +349,19 @@ export default {
   font-weight: 500;
   transition: all 0.3s;
   cursor: pointer;
+  border: none;
 }
 
-.btn-login:hover:not(:disabled) {
+.btn-register:hover:not(:disabled) {
   background-color: #555;
 }
 
-.btn-login:disabled {
+.btn-register:disabled {
   background-color: #999;
   cursor: not-allowed;
 }
 
-.back-links {
-  margin-top: 30px;
-  text-align: center;
-}
-
-.back-to-blog {
-  margin-bottom: 15px;
-}
-
-.back-to-blog a {
-  color: #606266;
-  font-size: 14px;
-  text-decoration: none;
-  transition: color 0.3s;
-}
-
-.back-to-blog a:hover {
-  color: #409EFF;
-}
-
-.register-link {
-  font-size: 14px;
-  color: #606266;
-}
-
-.register-link a {
-  color: #409EFF;
-  text-decoration: none;
-  margin-left: 5px;
-  transition: color 0.3s;
-}
-
-.register-link a:hover {
-  color: #66b1ff;
-  text-decoration: underline;
-}
-
-/* 登录成功后的操作区域 */
+/* 注册成功后的操作区域 */
 .success-actions {
   margin-top: 30px;
   padding: 20px;
@@ -452,13 +418,36 @@ export default {
   border: 1px solid #409EFF;
 }
 
+.btn-home:hover {
+  background: #f0f9ff;
+}
+
+.back-to-login {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 14px;
+  color: #606266;
+}
+
+.back-to-login a {
+  color: #409EFF;
+  text-decoration: none;
+  margin-left: 5px;
+  transition: color 0.3s;
+}
+
+.back-to-login a:hover {
+  color: #66b1ff;
+  text-decoration: underline;
+}
+
 /* 响应式设计 */
 @media (min-width: 768px) {
-  .login-left {
+  .register-left {
     display: block;
   }
   
-  .login-right {
+  .register-right {
     padding: 60px 40px;
   }
 }
@@ -471,17 +460,17 @@ export default {
 }
 
 @media (max-width: 767px) {
-  .login-layout {
+  .register-layout {
     flex-direction: column;
   }
   
-  .login-left {
+  .register-left {
     display: block;
     height: 300px;
     flex: none;
   }
   
-  .login-right {
+  .register-right {
     flex: 1;
     min-height: auto;
   }

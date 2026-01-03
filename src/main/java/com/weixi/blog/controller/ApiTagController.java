@@ -22,12 +22,21 @@ public class ApiTagController {
     private TagService tagService;
     
     /**
-     * 前台：查询所有标签（已废弃，保留兼容性）
+     * 前台：查询标签列表
+     * @param session HTTP会话，用于获取当前登录用户信息
      */
     @GetMapping("/list")
-    public Result<List<Tag>> getAllTags() {
+    public Result<List<Tag>> getAllTags(HttpSession session) {
         try {
-            List<Tag> tags = tagService.getAllTags();
+            Long userId = (Long) session.getAttribute("userId");
+            List<Tag> tags;
+            if (userId != null) {
+                // 已登录：只返回自己的标签
+                tags = tagService.getTagsByUserId(userId);
+            } else {
+                // 未登录：返回所有标签
+                tags = tagService.getAllTags();
+            }
             return Result.success(tags);
         } catch (Exception e) {
             log.error("查询标签列表失败", e);

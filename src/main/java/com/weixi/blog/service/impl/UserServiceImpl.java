@@ -94,4 +94,29 @@ public class UserServiceImpl implements UserService {
         user.setPassword(newPassword);
         userMapper.updateById(user);
     }
+    
+    @Override
+    @Transactional
+    public UserVO register(String username, String password, String nickname, String email) {
+        // 检查用户名是否已存在
+        User existingUser = findByUsername(username);
+        if (existingUser != null) {
+            throw new RuntimeException("用户名已存在");
+        }
+        
+        // 创建新用户
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password); // 直接存储密码（不加密，与现有逻辑保持一致）
+        user.setNickname(nickname != null && !nickname.trim().isEmpty() ? nickname : username);
+        user.setEmail(email);
+        
+        // 插入用户
+        userMapper.insert(user);
+        
+        // 转换为VO返回（不包含密码）
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        return userVO;
+    }
 }
