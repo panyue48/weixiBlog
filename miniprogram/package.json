@@ -1,0 +1,27 @@
+{
+  "name": "weixi-blog-miniprogram",
+  "version": "1.0.0",
+  "description": "微信小程序个人博客系统",
+  "main": "main.js",
+  "scripts": {
+    "dev:h5": "vite",
+    "dev:mp-weixin": "vite --mode mp-weixin",
+    "build:h5": "vite build --mode h5",
+    "build:mp-weixin": "vite build --mode mp-weixin"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "3.0.0-alpha-4080720251125001",
+    "@dcloudio/uni-app-plus": "3.0.0-alpha-4080720251125001",
+    "@dcloudio/uni-components": "3.0.0-alpha-4080720251125001",
+    "@dcloudio/uni-h5": "3.0.0-alpha-4080720251125001",
+    "@dcloudio/uni-mp-weixin": "3.0.0-alpha-4080720251125001",
+    "vue": "^3.3.4"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "^3.3.2",
+    "@dcloudio/vite-plugin-uni": "3.0.0-4080720251210001",
+    "sass": "^1.69.5",
+    "vite": "^5.2.8"
+  }
+}
+

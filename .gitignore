@@ -54,6 +54,15 @@ frontend/.vite/
 frontend/.DS_Store
 frontend/*.local
 
+# Miniprogram (微信小程序)
+miniprogram/node_modules/
+miniprogram/dist/
+miniprogram/.vite/
+miniprogram/.DS_Store
+miniprogram/*.local
+miniprogram/unpackage/
+miniprogram/.hbuilderx/
+
 # Environment
 .env
 .env.local
