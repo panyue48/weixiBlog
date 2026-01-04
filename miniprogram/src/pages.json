@@ -1,0 +1,110 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {}
+  },
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "博客首页",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/types/types",
+      "style": {
+        "navigationBarTitleText": "分类",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/tags/tags",
+      "style": {
+        "navigationBarTitleText": "标签",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/archive/archive",
+      "style": {
+        "navigationBarTitleText": "归档",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/detail/detail",
+      "style": {
+        "navigationBarTitleText": "博客详情"
+      }
+    },
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarTitleText": "登录"
+      }
+    },
+    {
+      "path": "pages/my-blogs/my-blogs",
+      "style": {
+        "navigationBarTitleText": "我的博客",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/blog-edit/blog-edit",
+      "style": {
+        "navigationBarTitleText": "编辑博客"
+      }
+    },
+    {
+      "path": "pages/type-manage/type-manage",
+      "style": {
+        "navigationBarTitleText": "分类管理"
+      }
+    },
+    {
+      "path": "pages/tag-manage/tag-manage",
+      "style": {
+        "navigationBarTitleText": "标签管理"
+      }
+    },
+    {
+      "path": "pages/profile/profile",
+      "style": {
+        "navigationBarTitleText": "个人信息"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "我的博客",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "color": "#71717A",
+    "selectedColor": "#2563EB",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/types/types",
+        "text": "分类"
+      },
+      {
+        "pagePath": "pages/tags/tags",
+        "text": "标签"
+      },
+      {
+        "pagePath": "pages/archive/archive",
+        "text": "归档"
+      }
+    ]
+  }
+}
+

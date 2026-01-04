@@ -1,0 +1,67 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ */
+
+/* 颜色变量 - 基于 UI UX Pro Max Portfolio/Personal 配色方案 */
+
+/* 行为相关颜色 */
+$uni-color-primary: #2563EB; // 现代蓝色
+$uni-color-success: #22C55E; // 现代绿色
+$uni-color-warning: #F59E0B; // 现代橙色
+$uni-color-error: #EF4444; // 现代红色
+
+/* 文字基本颜色 */
+$uni-text-color: #09090B; // 深色文字（Portfolio配色）
+$uni-text-color-inverse: #FAFAFA; // 反色
+$uni-text-color-grey: #71717A; // 辅助灰色
+$uni-text-color-placeholder: #A1A1AA;
+$uni-text-color-disable: #D4D4D8;
+
+/* 背景颜色 - Minimalism 风格 */
+$uni-bg-color: #FAFAFA; // 主背景（Portfolio配色）
+$uni-bg-color-grey: #F4F4F5; // 次要背景
+$uni-bg-color-hover: #E4E4E7; // 点击状态颜色
+$uni-bg-color-mask: rgba(0, 0, 0, 0.5); // 遮罩颜色
+
+/* 边框颜色 */
+$uni-border-color: #E4E4E7; // 浅灰色边框
+
+/* 尺寸变量 */
+
+/* 文字尺寸 */
+$uni-font-size-sm: 24rpx;
+$uni-font-size-base: 28rpx;
+$uni-font-size-lg: 32rpx;
+
+/* 图片尺寸 */
+$uni-img-size-sm: 40rpx;
+$uni-img-size-base: 52rpx;
+$uni-img-size-lg: 80rpx;
+
+/* Border Radius */
+$uni-border-radius-sm: 4rpx;
+$uni-border-radius-base: 8rpx;
+$uni-border-radius-lg: 12rpx;
+$uni-border-radius-circle: 50%;
+
+/* 水平间距 */
+$uni-spacing-row-sm: 10rpx;
+$uni-spacing-row-base: 20rpx;
+$uni-spacing-row-lg: 30rpx;
+
+/* 垂直间距 */
+$uni-spacing-col-sm: 8rpx;
+$uni-spacing-col-base: 16rpx;
+$uni-spacing-col-lg: 24rpx;
+
+/* 透明度 */
+$uni-opacity-disabled: 0.3; // 禁用态透明度
+
+/* 文章场景相关 - Modern Professional 字体风格 */
+$uni-color-title: #09090B; // 文章标题颜色（Portfolio配色）
+$uni-font-size-title: 44rpx; // 稍大一点，更现代
+$uni-color-subtitle: #18181B; // 二级标题颜色
+$uni-font-size-subtitle: 36rpx;
+$uni-color-paragraph: #27272A; // 文章段落颜色
+$uni-font-size-paragraph: 30rpx;
+
