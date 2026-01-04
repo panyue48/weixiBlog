@@ -1,6 +1,7 @@
 # Dependencies
 node_modules/
-package-lock.json
+# package-lock.json 应该被提交，所以注释掉
+# package-lock.json
 
 # Build outputs
 dist/
